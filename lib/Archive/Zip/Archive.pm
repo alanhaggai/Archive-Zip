@@ -210,8 +210,8 @@ sub addMember {
 
 sub addFile {
     my $self      = shift;
-    my $fileName  = shift;
-    my $newName   = shift;
+    my $fileName  = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{fileName} : shift;
+    my $newName   = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{newName} : shift;
     my $newMember = $self->ZIPMEMBERCLASS->newFromFile( $fileName, $newName );
     if ( $self->{'storeSymbolicLink'} && -l $fileName ) {
         my $newMember = $self->ZIPMEMBERCLASS->newFromString(readlink $fileName, $newName);
