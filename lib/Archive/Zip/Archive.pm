@@ -74,7 +74,8 @@ sub memberNames {
 
 # return ref to member with given name or undef
 sub memberNamed {
-    my ( $self, $fileName ) = @_;
+    my $self     = shift;
+    my $fileName = ( ref( $_[0] ) eq 'HASH' ) ? shift->{fileName} : shift;
     foreach my $member ( $self->members() ) {
         return $member if $member->fileName() eq $fileName;
     }
