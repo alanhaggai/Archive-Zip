@@ -142,7 +142,9 @@ sub removeMember {
 }
 
 sub replaceMember {
-    my ( $self, $oldMember, $newMember ) = @_;
+    my $self       = shift;
+    my $oldMember  = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{memberOrName} : shift;
+    my $newMember  = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{newMember} : shift;
     $oldMember = $self->memberNamed($oldMember) unless ref($oldMember);
     return undef unless $oldMember;
     return undef unless $newMember;
