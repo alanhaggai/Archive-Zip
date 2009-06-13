@@ -323,8 +323,8 @@ sub chunkSize {
 	return $Archive::Zip::ChunkSize;
 }
 
-sub setErrorHandler (&) {
-	my $errorHandler = shift;
+sub setErrorHandler {
+	my $errorHandler = ( ref( $_[0] ) eq 'HASH' ) ? shift->{subroutine} : shift;
 	$errorHandler = \&Carp::carp unless defined($errorHandler);
 	my $oldErrorHandler = $Archive::Zip::ErrorHandler;
 	$Archive::Zip::ErrorHandler = $errorHandler;
