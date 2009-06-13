@@ -258,7 +258,9 @@ sub addDirectory {
 # add either a file or a directory.
 
 sub addFileOrDirectory {
-    my ( $self, $name, $newName ) = @_;
+    my $self    = shift;
+    my $name    = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{name} : shift;
+    my $newName = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{newName} : shift;
     $name =~ s{/$}{};
     if ( $newName ) {
         $newName =~ s{/$}{};
