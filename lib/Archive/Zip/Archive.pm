@@ -83,7 +83,8 @@ sub memberNamed {
 }
 
 sub membersMatching {
-    my ( $self, $pattern ) = @_;
+    my $self    = shift;
+    my $pattern = ( ref( $_[0] ) eq 'HASH' ) ? shift->{regex} : shift;
     return grep { $_->fileName() =~ /$pattern/ } $self->members();
 }
 
