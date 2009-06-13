@@ -225,8 +225,15 @@ sub addFile {
 }
 
 sub addString {
-    my $self      = shift;
-    my $newMember = $self->ZIPMEMBERCLASS->newFromString(@_);
+    my $self = shift;
+    my @args;
+    if ( ref( $_[0] ) eq 'HASH' ) {
+        push @args, $_[0]->{stringOrStringRef}, $_[0]->{name};
+    }
+    else {
+        @args = @_;
+    }
+    my $newMember = $self->ZIPMEMBERCLASS->newFromString(@args);
     return $self->addMember($newMember);
 }
 
