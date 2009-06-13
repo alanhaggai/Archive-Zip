@@ -46,8 +46,9 @@ sub new {
         $class
     );
     $self->{'members'} = [];
-    if (@_) {
-        my $status = $self->read(@_);
+    my $fileName = ( ref( $_[0] ) eq 'HASH' ) ? shift->{'fileName'} : shift;
+    if ($fileName) {
+        my $status = $self->read($fileName);
         return $status == AZ_OK ? $self : undef;
     }
     return $self;
