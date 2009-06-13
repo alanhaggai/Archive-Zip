@@ -706,8 +706,9 @@ sub extractTree {
 
 sub updateMember {
     my $self      = shift;
-    my $oldMember = shift;
-    my $fileName  = shift;
+    my $oldMember = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{memberOrName} : shift;
+    my $fileName =
+      ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{fileOrDirectoryName} : shift;
 
     if ( !defined($fileName) ) {
         _error("updateMember(): missing fileName argument");
