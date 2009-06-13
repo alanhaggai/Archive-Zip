@@ -132,7 +132,8 @@ sub fileName {
 }
 
 sub removeMember {
-    my ( $self, $member ) = @_;
+    my $self    = shift;
+    my $member  = ( ref( $_[0] ) eq 'HASH' ) ? shift->{memberOrName} : shift;
     $member = $self->memberNamed($member) unless ref($member);
     return undef unless $member;
     my @newMembers = grep { $_ != $member } $self->members();
