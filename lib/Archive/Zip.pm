@@ -312,8 +312,8 @@ sub computeCRC32 {
 # Report or change chunk size used for reading and writing.
 # Also sets Zlib's default buffer size (eventually).
 sub setChunkSize {
-	my $chunkSize = shift;
-	$chunkSize = shift if ref($chunkSize);    # object method on zip?
+	shift if ref( $_[0] ) eq 'Archive::Zip::Archive';
+	my $chunkSize = ( ref( $_[0] ) eq 'HASH' ) ? shift->{size} : shift;
 	my $oldChunkSize = $Archive::Zip::ChunkSize;
 	$Archive::Zip::ChunkSize = $chunkSize if ($chunkSize);
 	return $oldChunkSize;
