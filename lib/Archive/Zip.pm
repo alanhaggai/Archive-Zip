@@ -495,7 +495,7 @@ sub _readSignature {
 #
 
 sub tempFile {
-	my $dir = shift;
+	my $dir = ( ref( $_[0] ) eq 'HASH' ) ? shift->{tmpDir} : shift;
 	my ( $fh, $filename ) = File::Temp::tempfile(
 		SUFFIX => '.zip',
 		UNLINK => 0,        # we will delete it!
