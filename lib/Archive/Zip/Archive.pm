@@ -202,7 +202,8 @@ sub extractMemberWithoutPaths {
 }
 
 sub addMember {
-    my ( $self, $newMember ) = @_;
+    my $self       = shift;
+    my $newMember  = ( ref( $_[0] ) eq 'HASH' ) ? shift->{member} : shift;
     push( @{ $self->{'members'} }, $newMember ) if $newMember;
     return $newMember;
 }
