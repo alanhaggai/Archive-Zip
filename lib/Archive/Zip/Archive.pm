@@ -279,7 +279,9 @@ sub addFileOrDirectory {
 }
 
 sub contents {
-    my ( $self, $member, $newContents ) = @_;
+    my $self        = shift;
+    my $member      = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{memberOrMemberName} : shift;
+    my $newContents = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{newContents} : shift;
     return _error('No member name given') unless $member;
     $member = $self->memberNamed($member) unless ref($member);
     return undef unless $member;
