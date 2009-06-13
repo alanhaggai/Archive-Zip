@@ -116,7 +116,8 @@ sub zipfileComment {
     my $self    = shift;
     my $comment = $self->{'zipfileComment'};
     if (@_) {
-        $self->{'zipfileComment'} = pack( 'C0a*', shift() );    # avoid unicode
+        my $new_comment = ( ref( $_[0] ) eq 'HASH' ) ? shift->{comment} : shift;
+        $self->{'zipfileComment'} = pack( 'C0a*', $new_comment );    # avoid unicode
     }
     return $comment;
 }
