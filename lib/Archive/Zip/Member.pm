@@ -154,7 +154,8 @@ sub desiredCompressionMethod {
 
 sub desiredCompressionLevel {
     my $self                       = shift;
-    my $newDesiredCompressionLevel = shift;
+    my $newDesiredCompressionLevel =
+      ( ref( $_[0] ) eq 'HASH' ) ? shift->{compressionLevel} : shift;
     my $oldDesiredCompressionLevel = $self->{'desiredCompressionLevel'};
     if ( defined($newDesiredCompressionLevel) ) {
         $self->{'desiredCompressionLevel'}  = $newDesiredCompressionLevel;
