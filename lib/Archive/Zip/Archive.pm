@@ -238,7 +238,9 @@ sub addString {
 }
 
 sub addDirectory {
-    my ( $self, $name, $newName ) = @_;
+    my $self    = shift;
+    my $name    = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{directoryName} : shift;
+    my $newName = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{newName} : shift;
     my $newMember = $self->ZIPMEMBERCLASS->newDirectoryNamed( $name, $newName );
     if ( $self->{'storeSymbolicLink'} && -l $name ) {
         my $link = readlink $name;
