@@ -137,7 +137,8 @@ sub compressionMethod {
 
 sub desiredCompressionMethod {
     my $self                        = shift;
-    my $newDesiredCompressionMethod = shift;
+    my $newDesiredCompressionMethod =
+      ( ref( $_[0] ) eq 'HASH' ) ? shift->{compressionMethod} : shift;
     my $oldDesiredCompressionMethod = $self->{'desiredCompressionMethod'};
     if ( defined($newDesiredCompressionMethod) ) {
         $self->{'desiredCompressionMethod'} = $newDesiredCompressionMethod;
