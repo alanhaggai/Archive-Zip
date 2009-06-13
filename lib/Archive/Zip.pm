@@ -287,9 +287,25 @@ sub new {
 }
 
 sub computeCRC32 {
-	my $data = shift;
-	$data = shift if ref($data);    # allow calling as an obj method
-	my $crc = shift;
+	my ( $data, $crc );
+
+	# For backward compatibility, the following deliberately fails when called
+	# as a class method
+	if ( ref( $_[$#_] ) eq 'HASH' ) {
+		my $temp = pop;
+		if ( !exists $_[0] || UNIVERSAL::isa( $_[0], 'Archive::Zip::Archive' ) )
+		{
+			$data = $temp->{string};
+			$crc  = $temp->{crc};
+		}
+	}
+	else {
+		shift if ( UNIVERSAL::isa( $_[0], 'Archive::Zip::Archive' ) );
+		unless ( UNIVERSAL::isa( $_[0], 'Archive::Zip' ) ) {
+			( $data, $crc ) = @_;
+		}
+	}
+
 	return Compress::Zlib::crc32( $data, $crc );
 }
 
