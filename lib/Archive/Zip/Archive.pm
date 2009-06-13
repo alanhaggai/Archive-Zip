@@ -185,12 +185,12 @@ sub extractMember {
 
 sub extractMemberWithoutPaths {
     my $self   = shift;
-    my $member = shift;
+    my $member = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{memberOrName} : shift;
     $member = $self->memberNamed($member) unless ref($member);
     return _error('member not found') unless $member;
     my $originalSize = $member->compressedSize();
     return AZ_OK if $member->isDirectory();
-    my $name = shift;
+    my $name = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{extractedName} : shift;
     unless ($name) {
         $name = $member->fileName();
         $name =~ s{.*/}{};    # strip off directories, if any
