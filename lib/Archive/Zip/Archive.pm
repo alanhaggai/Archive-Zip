@@ -156,11 +156,11 @@ sub replaceMember {
 
 sub extractMember {
     my $self   = shift;
-    my $member = shift;
+    my $member  = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{memberOrName} : shift;
     $member = $self->memberNamed($member) unless ref($member);
     return _error('member not found') unless $member;
     my $originalSize = $member->compressedSize();
-    my $name         = shift;                       # local FS name if given
+    my $name  = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{extractedName} : shift;  # local FS name if given
     my ( $volumeName, $dirName, $fileName );
     if ( defined($name) ) {
         ( $volumeName, $dirName, $fileName ) = File::Spec->splitpath($name);
