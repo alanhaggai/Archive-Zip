@@ -312,11 +312,19 @@ sub writeToFileNamed {
 # perhaps to make a self-extracting archive.
 sub writeToFileHandle {
     my $self = shift;
-    my $fh   = shift;
+    my $fh   = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{fileHandle} : shift;
     return _error('No filehandle given')   unless $fh;
     return _ioError('filehandle not open') unless $fh->opened();
 
-    my $fhIsSeekable = @_ ? shift: _isSeekable($fh);
+    my $fhIsSeekable;
+    if ( ref( $_[0] ) eq 'HASH' ) {
+        $fhIsSeekable =
+          exists( $_[0]->{seekable} ) ? $_[0]->{seekable} : _isSeekable($fh);
+    }
+    else {
+        $fhIsSeekable = @_ ? shift : _isSeekable($fh);
+    }
+
     _binmode($fh);
 
     # Find out where the current position is.
