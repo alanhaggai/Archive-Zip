@@ -290,7 +290,8 @@ sub contents {
 
 sub writeToFileNamed {
     my $self     = shift;
-    my $fileName = shift;    # local FS format
+    my $fileName =
+      ( ref( $_[0] ) eq 'HASH' ) ? shift->{fileName} : shift; # local FS format
     foreach my $member ( $self->members() ) {
         if ( $member->_usesFileNamed($fileName) ) {
             return _error( "$fileName is needed by member "
