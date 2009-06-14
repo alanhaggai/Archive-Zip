@@ -481,8 +481,8 @@ sub read {
 
 sub readFromFileHandle {
     my $self     = shift;
-    my $fh       = shift;
-    my $fileName = shift;
+    my $fh       = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{fileHandle} : shift;
+    my $fileName = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{fileName} : shift;
     $fileName = $fh unless defined($fileName);
     return _error('No filehandle given')   unless $fh;
     return _ioError('filehandle not open') unless $fh->opened();
