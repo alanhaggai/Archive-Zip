@@ -442,7 +442,9 @@ sub _writeEndOfCentralDirectory {
 
 # $offset can be specified to truncate a zip file.
 sub writeCentralDirectory {
-    my ( $self, $fh, $offset ) = @_;
+    my $self   = shift;
+    my $fh     = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{fileHandle} : shift;
+    my $offset = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{offset} : shift;
 
     if ( defined($offset) ) {
         $self->{'writeCentralDirectoryOffset'} = $offset;
