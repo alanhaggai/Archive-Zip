@@ -360,7 +360,7 @@ sub overwrite {
 # Returns AZ_OK if successful.
 sub overwriteAs {
     my $self    = shift;
-    my $zipName = shift;
+    my $zipName = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{newName} : shift;
     return _error("no filename in overwriteAs()") unless defined($zipName);
 
     my ( $fh, $tempName ) = Archive::Zip::tempFile();
