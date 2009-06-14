@@ -466,7 +466,7 @@ sub writeCentralDirectory {
 
 sub read {
     my $self     = shift;
-    my $fileName = shift;
+    my $fileName = ( ref( $_[0] ) eq 'HASH' ) ? shift->{fileName} : shift;
     return _error('No filename given') unless $fileName;
     my ( $status, $fh ) = _newFileHandle( $fileName, 'r' );
     return _ioError("opening $fileName for read") unless $status;
