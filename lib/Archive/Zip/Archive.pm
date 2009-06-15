@@ -626,11 +626,21 @@ sub _untaintDir {
 
 sub addTree {
     my $self = shift;
-    my $root = shift or return _error("root arg missing in call to addTree()");
-    my $dest = shift;
+    my ( $root, $dest, $pred, $compressionLevel );
+    if ( ref( $_[0] ) eq 'HASH' ) {
+        $root             = $_[0]->{root};
+        $dest             = $_[0]->{dest};
+        $pred             = $_[0]->{choose};
+        $compressionLevel = $_[0]->{desiredCompressionLevel};
+    }
+    else {
+        ( $root, $dest, $pred, $compressionLevel ) = @_;
+    }
+    return _error("root arg missing in call to addTree()")
+      unless defined($root);
     $dest = '' unless defined($dest);
-    my $pred = shift || sub { -r };
-    my $compressionLevel = shift;
+    $pred = sub { -r } unless defined($pred);
+
     my @files;
     my $startDir = _untaintDir( cwd() );
 
