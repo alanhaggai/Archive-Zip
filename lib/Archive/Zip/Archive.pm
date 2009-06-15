@@ -640,6 +640,8 @@ sub addTree {
       unless defined($root);
     $dest = '' unless defined($dest);
     $pred = sub { -r } unless defined($pred);
+    $compressionLevel = 6
+      unless defined($compressionLevel);
 
     my @files;
     my $startDir = _untaintDir( cwd() );
