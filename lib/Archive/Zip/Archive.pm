@@ -686,16 +686,27 @@ sub addTree {
 
 sub addTreeMatching {
     my $self = shift;
-    my $root = shift
-      or return _error("root arg missing in call to addTreeMatching()");
-    my $dest = shift;
+    my ( $root, $dest, $pattern, $pred, $compressionLevel );
+    if ( ref( $_[0] ) eq 'HASH' ) {
+        $root             = $_[0]->{root};
+        $dest             = $_[0]->{dest};
+        $pattern          = $_[0]->{pattern};
+        $pred             = $_[0]->{choose};
+        $compressionLevel = $_[0]->{desiredCompressionLevel};
+    }
+    else {
+        ( $root, $dest, $pattern, $pred, $compressionLevel ) = @_;
+    }
+    return _error("root arg missing in call to addTreeMatching()")
+      unless defined($root);
     $dest = '' unless defined($dest);
-    my $pattern = shift
-      or return _error("pattern missing in call to addTreeMatching()");
-    my $pred = shift;
+    return _error("pattern missing in call to addTreeMatching()")
+      unless defined($pattern);
+    $compressionLevel = 6
+      unless defined($compressionLevel);
     my $matcher =
       $pred ? sub { m{$pattern} && &$pred } : sub { m{$pattern} && -r };
-    return $self->addTree( $root, $dest, $matcher );
+    return $self->addTree( $root, $dest, $matcher, $compressionLevel );
 }
 
 # $zip->extractTree( $root, $dest [, $volume] );
