@@ -806,14 +806,25 @@ sub updateMember {
 
 sub updateTree {
     my $self = shift;
-    my $root = shift
-      or return _error("root arg missing in call to updateTree()");
-    my $dest = shift;
-    $dest = '' unless defined($dest);
-    $dest = _asZipDirName( $dest, 1 );
-    my $pred = shift || sub { -r };
-    my $mirror = shift;
+    my ( $root, $dest, $pred, $mirror, $compressionLevel );
+    if ( ref( $_[0] ) eq 'HASH' ) {
+        $root             = $_[0]->{root};
+        $dest             = $_[0]->{dest};
+        $pred             = $_[0]->{choose};
+        $mirror           = $_[0]->{mirror};
+        $compressionLevel = $_[0]->{desiredCompressionLevel};
+    }
+    else {
+        ( $root, $dest, $pred, $mirror, $compressionLevel ) = @_;
+    }
 
+    return _error("root arg missing in call to updateTree()")
+      unless defined($root);
+    $dest             = '' unless defined($dest);
+    $pred             = sub { -r } unless defined($pred);
+    $compressionLevel = 6 unless defined($compressionLevel);
+
+    $dest = _asZipDirName( $dest, 1 );
     my $rootZipName = _asZipDirName( $root, 1 );    # with trailing slash
     my $pattern = $rootZipName eq './' ? '^' : "^\Q$rootZipName\E";
 
@@ -851,6 +862,7 @@ sub updateTree {
 
         $done{$memberName} = 1;
         my $changedMember = $self->updateMember( $memberName, $fileName );
+        $changedMember->desiredCompressionLevel($compressionLevel);
         return _error("updateTree failed to update $fileName")
           unless ref($changedMember);
     }
