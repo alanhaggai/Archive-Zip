@@ -740,9 +740,16 @@ sub extractTree {
 
 sub updateMember {
     my $self      = shift;
-    my $oldMember = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{memberOrName} : shift;
-    my $fileName =
-      ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{fileOrDirectoryName} : shift;
+
+    my ( $oldMember, $fileName, $compressionLevel );
+    if ( ref( $_[0] ) eq 'HASH' ) {
+        $oldMember        = $_[0]->{memberOrName};
+        $fileName         = $_[0]->{fileOrDirectoryName};
+        $compressionLevel = $_[0]->{desiredCompressionLevel};
+    }
+    else {
+        ( $oldMember, $fileName, $compressionLevel ) = @_;
+    }
 
     if ( !defined($fileName) ) {
         _error("updateMember(): missing fileName argument");
@@ -768,6 +775,10 @@ sub updateMember {
               _asZipDirName( $oldMember, $isDir ) );
     }
 
+    if ( defined($compressionLevel) && defined($oldMember) ) {
+        $oldMember->desiredCompressionLevel($compressionLevel);
+    }
+
     unless ( defined($oldMember)
         && $oldMember->lastModTime() == $newStat[9]
         && $oldMember->isDirectory() == $isDir
@@ -778,6 +789,10 @@ sub updateMember {
         my $newMember = $isDir
           ? $self->ZIPMEMBERCLASS->newDirectoryNamed( $fileName, $memberName )
           : $self->ZIPMEMBERCLASS->newFromFile( $fileName, $memberName );
+
+        if ( defined($compressionLevel) ) {
+            $newMember->desiredCompressionLevel($compressionLevel);
+        }
 
         unless ( defined($newMember) ) {
             _error("creation of member $fileName failed in updateMember()");
