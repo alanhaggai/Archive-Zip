@@ -781,7 +781,7 @@ sub updateMember {
               _asZipDirName( $oldMember, $isDir ) );
     }
 
-    if ( defined($compressionLevel) && defined($oldMember) ) {
+    if ( defined($oldMember) ) {
         $oldMember->desiredCompressionLevel($compressionLevel);
     }
 
@@ -795,10 +795,7 @@ sub updateMember {
         my $newMember = $isDir
           ? $self->ZIPMEMBERCLASS->newDirectoryNamed( $fileName, $memberName )
           : $self->ZIPMEMBERCLASS->newFromFile( $fileName, $memberName );
-
-        if ( defined($compressionLevel) ) {
-            $newMember->desiredCompressionLevel($compressionLevel);
-        }
+        $newMember->desiredCompressionLevel($compressionLevel);
 
         unless ( defined($newMember) ) {
             _error("creation of member $fileName failed in updateMember()");
