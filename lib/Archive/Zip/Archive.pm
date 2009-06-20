@@ -210,9 +210,19 @@ sub addMember {
 
 sub addFile {
     my $self      = shift;
-    my $fileName  = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{fileName} : shift;
-    my $newName   = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{newName} : shift;
+
+    my ( $fileName, $newName, $compressionLevel );
+    if ( ref( $_[0] ) eq 'HASH' ) {
+        $fileName         = $_[0]->{fileName};
+        $newName          = $_[0]->{newName};
+        $compressionLevel = $_[0]->{desiredCompressionLevel};
+    }
+    else {
+        ( $fileName, $newName, $compressionLevel ) = @_;
+    }
+
     my $newMember = $self->ZIPMEMBERCLASS->newFromFile( $fileName, $newName );
+    $newMember->desiredCompressionLevel($compressionLevel);
     if ( $self->{'storeSymbolicLink'} && -l $fileName ) {
         my $newMember = $self->ZIPMEMBERCLASS->newFromString(readlink $fileName, $newName);
         # For symbolic links, External File Attribute is set to 0xA1FF0000 by Info-ZIP
