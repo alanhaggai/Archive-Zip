@@ -640,8 +640,6 @@ sub addTree {
       unless defined($root);
     $dest = '' unless defined($dest);
     $pred = sub { -r } unless defined($pred);
-    $compressionLevel = 6
-      unless defined($compressionLevel);
 
     my @files;
     my $startDir = _untaintDir( cwd() );
@@ -702,8 +700,6 @@ sub addTreeMatching {
     $dest = '' unless defined($dest);
     return _error("pattern missing in call to addTreeMatching()")
       unless defined($pattern);
-    $compressionLevel = 6
-      unless defined($compressionLevel);
     my $matcher =
       $pred ? sub { m{$pattern} && &$pred } : sub { m{$pattern} && -r };
     return $self->addTree( $root, $dest, $matcher, $compressionLevel );
@@ -835,9 +831,8 @@ sub updateTree {
 
     return _error("root arg missing in call to updateTree()")
       unless defined($root);
-    $dest             = '' unless defined($dest);
-    $pred             = sub { -r } unless defined($pred);
-    $compressionLevel = 6 unless defined($compressionLevel);
+    $dest = '' unless defined($dest);
+    $pred = sub { -r } unless defined($pred);
 
     $dest = _asZipDirName( $dest, 1 );
     my $rootZipName = _asZipDirName( $root, 1 );    # with trailing slash
