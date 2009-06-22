@@ -274,8 +274,17 @@ sub addDirectory {
 
 sub addFileOrDirectory {
     my $self    = shift;
-    my $name    = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{name} : shift;
-    my $newName = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{newName} : shift;
+
+    my ( $name, $newName, $compressionLevel );
+    if ( ref( $_[0] ) eq 'HASH' ) {
+        $name             = $_[0]->{name};
+        $newName          = $_[0]->{newName};
+        $compressionLevel = $_[0]->{desiredCompressionLevel};
+    }
+    else {
+        ( $name, $newName, $compressionLevel ) = @_;
+    }
+
     $name =~ s{/$}{};
     if ( $newName ) {
         $newName =~ s{/$}{};
@@ -283,7 +292,7 @@ sub addFileOrDirectory {
         $newName = $name;
     }
     if ( -f $name ) {
-        return $self->addFile( $name, $newName );
+        return $self->addFile( $name, $newName, $compressionLevel );
     }
     elsif ( -d $name ) {
         return $self->addDirectory( $name, $newName );
