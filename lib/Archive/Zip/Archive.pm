@@ -142,9 +142,17 @@ sub removeMember {
 }
 
 sub replaceMember {
-    my $self       = shift;
-    my $oldMember  = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{memberOrName} : shift;
-    my $newMember  = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{newMember} : shift;
+    my $self = shift;
+
+    my ( $oldMember, $newMember );
+    if ( ref( $_[0] ) eq 'HASH' ) {
+        $oldMember = $_[0]->{memberOrName};
+        $newMember = $_[0]->{newMember};
+    }
+    else {
+        ( $oldMember, $newMember ) = @_;
+    }
+
     $oldMember = $self->memberNamed($oldMember) unless ref($oldMember);
     return undef unless $oldMember;
     return undef unless $newMember;
@@ -155,12 +163,20 @@ sub replaceMember {
 }
 
 sub extractMember {
-    my $self   = shift;
-    my $member  = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{memberOrName} : shift;
+    my $self = shift;
+
+    my ( $member, $name );
+    if ( ref( $_[0] ) eq 'HASH' ) {
+        $member = $_[0]->{memberOrName};
+        $name   = $_[0]->{extractedName};
+    }
+    else {
+        ( $member, $name ) = @_;
+    }
+
     $member = $self->memberNamed($member) unless ref($member);
     return _error('member not found') unless $member;
     my $originalSize = $member->compressedSize();
-    my $name  = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{extractedName} : shift;  # local FS name if given
     my ( $volumeName, $dirName, $fileName );
     if ( defined($name) ) {
         ( $volumeName, $dirName, $fileName ) = File::Spec->splitpath($name);
@@ -184,13 +200,21 @@ sub extractMember {
 }
 
 sub extractMemberWithoutPaths {
-    my $self   = shift;
-    my $member = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{memberOrName} : shift;
+    my $self = shift;
+
+    my ( $member, $name );
+    if ( ref( $_[0] ) eq 'HASH' ) {
+        $member = $_[0]->{memberOrName};
+        $name   = $_[0]->{extractedName};
+    }
+    else {
+        ( $member, $name ) = @_;
+    }
+
     $member = $self->memberNamed($member) unless ref($member);
     return _error('member not found') unless $member;
     my $originalSize = $member->compressedSize();
     return AZ_OK if $member->isDirectory();
-    my $name = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{extractedName} : shift;
     unless ($name) {
         $name = $member->fileName();
         $name =~ s{.*/}{};    # strip off directories, if any
@@ -209,7 +233,7 @@ sub addMember {
 }
 
 sub addFile {
-    my $self      = shift;
+    my $self = shift;
 
     my ( $fileName, $newName, $compressionLevel );
     if ( ref( $_[0] ) eq 'HASH' ) {
@@ -236,6 +260,7 @@ sub addFile {
 
 sub addString {
     my $self = shift;
+
     my ( $stringOrStringRef, $name, $compressionLevel );
     if ( ref( $_[0] ) eq 'HASH' ) {
         $stringOrStringRef = $_[0]->{stringOrStringRef};
@@ -245,6 +270,7 @@ sub addString {
     else {
         ( $stringOrStringRef, $name, $compressionLevel ) = @_;;
     }
+
     my $newMember = $self->ZIPMEMBERCLASS->newFromString(
         $stringOrStringRef, $name
     );
@@ -253,9 +279,17 @@ sub addString {
 }
 
 sub addDirectory {
-    my $self    = shift;
-    my $name    = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{directoryName} : shift;
-    my $newName = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{newName} : shift;
+    my $self = shift;
+
+    my ( $name, $newName );
+    if ( ref( $_[0] ) eq 'HASH' ) {
+        $name    = $_[0]->{directoryName};
+        $newName = $_[0]->{newName};
+    }
+    else {
+        ( $name, $newName ) = @_;
+    }
+
     my $newMember = $self->ZIPMEMBERCLASS->newDirectoryNamed( $name, $newName );
     if ( $self->{'storeSymbolicLink'} && -l $name ) {
         my $link = readlink $name;
@@ -273,7 +307,7 @@ sub addDirectory {
 # add either a file or a directory.
 
 sub addFileOrDirectory {
-    my $self    = shift;
+    my $self = shift;
 
     my ( $name, $newName, $compressionLevel );
     if ( ref( $_[0] ) eq 'HASH' ) {
@@ -303,9 +337,17 @@ sub addFileOrDirectory {
 }
 
 sub contents {
-    my $self        = shift;
-    my $member      = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{memberOrMemberName} : shift;
-    my $newContents = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{newContents} : shift;
+    my $self = shift;
+
+    my ( $member, $newContents );
+    if ( ref( $_[0] ) eq 'HASH' ) {
+        $member      = $_[0]->{memberOrMemberName};
+        $newContents = $_[0]->{newContents};
+    }
+    else {
+        ( $member, $newContents ) = @_;
+    }
+
     return _error('No member name given') unless $member;
     $member = $self->memberNamed($member) unless ref($member);
     return undef unless $member;
@@ -313,9 +355,9 @@ sub contents {
 }
 
 sub writeToFileNamed {
-    my $self     = shift;
+    my $self = shift;
     my $fileName =
-      ( ref( $_[0] ) eq 'HASH' ) ? shift->{fileName} : shift; # local FS format
+      ( ref( $_[0] ) eq 'HASH' ) ? shift->{fileName} : shift;  # local FS format
     foreach my $member ( $self->members() ) {
         if ( $member->_usesFileNamed($fileName) ) {
             return _error( "$fileName is needed by member "
@@ -336,19 +378,20 @@ sub writeToFileNamed {
 # perhaps to make a self-extracting archive.
 sub writeToFileHandle {
     my $self = shift;
-    my $fh   = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{fileHandle} : shift;
-    return _error('No filehandle given')   unless $fh;
-    return _ioError('filehandle not open') unless $fh->opened();
 
-    my $fhIsSeekable;
+    my ( $fh, $fhIsSeekable );
     if ( ref( $_[0] ) eq 'HASH' ) {
+        $fh = $_[0]->{fileHandle};
         $fhIsSeekable =
           exists( $_[0]->{seekable} ) ? $_[0]->{seekable} : _isSeekable($fh);
     }
     else {
+        $fh = shift;
         $fhIsSeekable = @_ ? shift : _isSeekable($fh);
     }
 
+    return _error('No filehandle given')   unless $fh;
+    return _ioError('filehandle not open') unless $fh->opened();
     _binmode($fh);
 
     # Find out where the current position is.
@@ -466,9 +509,16 @@ sub _writeEndOfCentralDirectory {
 
 # $offset can be specified to truncate a zip file.
 sub writeCentralDirectory {
-    my $self   = shift;
-    my $fh     = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{fileHandle} : shift;
-    my $offset = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{offset} : shift;
+    my $self = shift;
+
+    my ( $fh, $offset );
+    if ( ref( $_[0] ) eq 'HASH' ) {
+        $fh     = $_[0]->{fileHandle};
+        $offset = $_[0]->{offset};
+    }
+    else {
+        ( $fh, $offset ) = @_;
+    }
 
     if ( defined($offset) ) {
         $self->{'writeCentralDirectoryOffset'} = $offset;
@@ -504,9 +554,17 @@ sub read {
 }
 
 sub readFromFileHandle {
-    my $self     = shift;
-    my $fh       = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{fileHandle} : shift;
-    my $fileName = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{fileName} : shift;
+    my $self = shift;
+
+    my ( $fh, $fileName );
+    if ( ref( $_[0] ) eq 'HASH' ) {
+        $fh       = $_[0]->{fileHandle};
+        $fileName = $_[0]->{fileName};
+    }
+    else {
+        ( $fh, $fileName ) = @_;
+    }
+
     $fileName = $fh unless defined($fileName);
     return _error('No filehandle given')   unless $fh;
     return _ioError('filehandle not open') unless $fh->opened();
@@ -650,6 +708,7 @@ sub _untaintDir {
 
 sub addTree {
     my $self = shift;
+
     my ( $root, $dest, $pred, $compressionLevel );
     if ( ref( $_[0] ) eq 'HASH' ) {
         $root             = $_[0]->{root};
@@ -660,6 +719,7 @@ sub addTree {
     else {
         ( $root, $dest, $pred, $compressionLevel ) = @_;
     }
+
     return _error("root arg missing in call to addTree()")
       unless defined($root);
     $dest = '' unless defined($dest);
@@ -708,6 +768,7 @@ sub addTree {
 
 sub addTreeMatching {
     my $self = shift;
+
     my ( $root, $dest, $pattern, $pred, $compressionLevel );
     if ( ref( $_[0] ) eq 'HASH' ) {
         $root             = $_[0]->{root};
@@ -719,6 +780,7 @@ sub addTreeMatching {
     else {
         ( $root, $dest, $pattern, $pred, $compressionLevel ) = @_;
     }
+
     return _error("root arg missing in call to addTreeMatching()")
       unless defined($root);
     $dest = '' unless defined($dest);
@@ -759,7 +821,7 @@ sub extractTree {
 # Returns (possibly updated) member, if any; undef on errors.
 
 sub updateMember {
-    my $self      = shift;
+    my $self = shift;
 
     my ( $oldMember, $fileName );
     if ( ref( $_[0] ) eq 'HASH' ) {
@@ -832,6 +894,7 @@ sub updateMember {
 
 sub updateTree {
     my $self = shift;
+
     my ( $root, $dest, $pred, $mirror, $compressionLevel );
     if ( ref( $_[0] ) eq 'HASH' ) {
         $root             = $_[0]->{root};
