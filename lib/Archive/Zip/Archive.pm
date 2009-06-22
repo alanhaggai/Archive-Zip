@@ -236,14 +236,19 @@ sub addFile {
 
 sub addString {
     my $self = shift;
-    my @args;
+    my ( $stringOrStringRef, $name, $compressionLevel );
     if ( ref( $_[0] ) eq 'HASH' ) {
-        push @args, $_[0]->{stringOrStringRef}, $_[0]->{name};
+        $stringOrStringRef = $_[0]->{stringOrStringRef};
+        $name              = $_[0]->{name};
+        $compressionLevel  = $_[0]->{desiredCompressionLevel};
     }
     else {
-        @args = @_;
+        ( $stringOrStringRef, $name, $compressionLevel ) = @_;;
     }
-    my $newMember = $self->ZIPMEMBERCLASS->newFromString(@args);
+    my $newMember = $self->ZIPMEMBERCLASS->newFromString(
+        $stringOrStringRef, $name
+    );
+    $newMember->desiredCompressionLevel($compressionLevel);
     return $self->addMember($newMember);
 }
 
