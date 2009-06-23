@@ -357,9 +357,15 @@ sub unixFileAttributes {
 }
 
 sub localExtraField {
-    ( $#_ > 0 )
-      ? ( $_[0]->{'localExtraField'} = $_[1] )
-      : $_[0]->{'localExtraField'};
+    my $self = shift;
+
+    if (@_) {
+        $self->{localExtraField} = ( ref( $_[0] ) eq 'HASH' )
+          ? $_[0]->{newField} : $_[0];
+    }
+    else {
+        return $self->{localExtraField};
+    }
 }
 
 sub cdExtraField {
