@@ -752,7 +752,8 @@ sub _refreshLocalFileHeader {
 }
 
 sub readChunk {
-    my ( $self, $chunkSize ) = @_;
+    my $self = shift;
+    my $chunkSize = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{chunkSize} : $_[0];
 
     if ( $self->readIsDone() ) {
         $self->endRead();
