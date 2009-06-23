@@ -449,7 +449,9 @@ sub isBinaryFile {
 
 sub extractToFileNamed {
     my $self = shift;
-    my $name = shift;    # local FS name
+
+    # local FS name
+    my $name = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{fileName} : $_[0];
     $self->{'isSymbolicLink'} = 0;
 
     # Check if the file / directory is a symbolic link or not
