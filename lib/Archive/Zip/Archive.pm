@@ -798,11 +798,19 @@ sub addTreeMatching {
 #
 sub extractTree {
     my $self = shift;
-    my $root = shift;    # Zip format
+
+    my ( $root, $dest, $volume );
+    if ( ref( $_[0] ) eq 'HASH' ) {
+        $root   = $_[0]->{root};
+        $dest   = $_[0]->{dest};
+        $volume = $_[0]->{volume};
+    }
+    else {
+        ( $root, $dest, $volume ) = @_;
+    }
+
     $root = '' unless defined($root);
-    my $dest = shift;    # Zip format
     $dest = './' unless defined($dest);
-    my $volume  = shift;                              # optional
     my $pattern = "^\Q$root";
     my @members = $self->membersMatching($pattern);
 
