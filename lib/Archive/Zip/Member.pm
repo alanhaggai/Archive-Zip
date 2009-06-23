@@ -338,8 +338,11 @@ sub _mapPermissionsToUnix {
 sub unixFileAttributes {
     my $self     = shift;
     my $oldPerms = $self->_mapPermissionsToUnix;
+
+    my $perms;
     if ( @_ ) {
-        my $perms = shift;
+        $perms = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{newAttributes} : $_[0];
+
         if ( $self->isDirectory ) {
             $perms &= ~FILE_ATTRIB;
             $perms |= DIRECTORY_ATTRIB;
@@ -349,6 +352,7 @@ sub unixFileAttributes {
         }
         $self->{externalFileAttributes} = $self->_mapPermissionsFromUnix($perms);
     }
+
     return $oldPerms;
 }
 
