@@ -45,7 +45,18 @@ sub _newFromZipFile {
 
 sub newFromString {
     my $class = shift;
-    my $self  = $class->STRINGMEMBERCLASS->_newFromString(@_);
+
+    my ( $stringOrStringRef, $fileName );
+    if ( ref( $_[0] ) eq 'HASH' ) {
+        $stringOrStringRef = $_[0]->{stringOrStringRef};
+        $fileName          = $_[0]->{fileName};
+    }
+    else {
+        ( $stringOrStringRef, $fileName ) = @_;
+    }
+
+    my $self  = $class->STRINGMEMBERCLASS->_newFromString( $stringOrStringRef,
+        $fileName );
     return $self;
 }
 
