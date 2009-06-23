@@ -966,7 +966,7 @@ sub contents {
 sub extractToFileHandle {
     my $self = shift;
     return _error("encryption unsupported") if $self->isEncrypted();
-    my $fh = shift;
+    my $fh = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{fileHandle} : $_[0];
     _binmode($fh);
     my $oldCompression = $self->desiredCompressionMethod(COMPRESSION_STORED);
     my $status         = $self->rewindData(@_);
