@@ -129,9 +129,15 @@ sub versionMadeBy {
 }
 
 sub fileAttributeFormat {
-    ( $#_ > 0 )
-      ? ( $_[0]->{'fileAttributeFormat'} = $_[1] )
-      : $_[0]->{'fileAttributeFormat'};
+    my $self = shift;
+
+    if (@_) {
+        $self->{fileAttributeFormat} = ( ref( $_[0] ) eq 'HASH' )
+        ? $_[0]->{format} : $_[0];
+    }
+    else {
+        return $self->{fileAttributeFormat};
+    }
 }
 
 sub versionNeededToExtract {
