@@ -427,7 +427,7 @@ sub isTextFile {
     my $self = shift;
     my $bit  = $self->internalFileAttributes() & IFA_TEXT_FILE_MASK;
     if (@_) {
-        my $flag = shift;
+        my $flag = ( ref( $_[0] ) eq 'HASH' ) ? shift->{flag} : shift;
         $self->{'internalFileAttributes'} &= ~IFA_TEXT_FILE_MASK;
         $self->{'internalFileAttributes'} |=
           ( $flag ? IFA_TEXT_FILE: IFA_BINARY_FILE );
