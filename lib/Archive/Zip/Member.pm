@@ -69,7 +69,18 @@ sub newFromFile {
 
 sub newDirectoryNamed {
     my $class = shift;
-    my $self  = $class->DIRECTORYMEMBERCLASS->_newNamed(@_);
+
+    my ( $directoryName, $newName );
+    if ( ref( $_[0] ) eq 'HASH' ) {
+        $directoryName = $_[0]->{directoryName};
+        $newName       = $_[0]->{newName};
+    }
+    else {
+        ( $directoryName, $newName ) = @_;
+    }
+
+    my $self  = $class->DIRECTORYMEMBERCLASS->_newNamed( $directoryName,
+        $newName );
     return $self;
 }
 
