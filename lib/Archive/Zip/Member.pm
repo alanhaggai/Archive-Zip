@@ -378,9 +378,15 @@ sub extraFields {
 }
 
 sub fileComment {
-    ( $#_ > 0 )
-      ? ( $_[0]->{'fileComment'} = pack( 'C0a*', $_[1] ) )
-      : $_[0]->{'fileComment'};
+    my $self = shift;
+
+    if (@_) {
+        $self->{fileComment} = ( ref( $_[0] ) eq 'HASH' )
+          ? pack( 'C0a*', $_[0]->{newComment} ) : pack( 'C0a*', $_[0] );
+    }
+    else {
+        return $self->{fileComment};
+    }
 }
 
 sub hasDataDescriptor {
