@@ -369,7 +369,15 @@ sub localExtraField {
 }
 
 sub cdExtraField {
-    ( $#_ > 0 ) ? ( $_[0]->{'cdExtraField'} = $_[1] ) : $_[0]->{'cdExtraField'};
+    my $self = shift;
+
+    if (@_) {
+        $self->{cdExtraField} = ( ref( $_[0] ) eq 'HASH' )
+          ? $_[0]->{field} : $_[0];
+    }
+    else {
+        return $self->{cdExtraField};
+    }
 }
 
 sub extraFields {
