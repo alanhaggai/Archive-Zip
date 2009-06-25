@@ -46,7 +46,7 @@ sub new {
         $class
     );
     $self->{'members'} = [];
-    my $fileName = ( ref( $_[0] ) eq 'HASH' ) ? shift->{'fileName'} : shift;
+    my $fileName = ( ref( $_[0] ) eq 'HASH' ) ? shift->{filename} : shift;
     if ($fileName) {
         my $status = $self->read($fileName);
         return $status == AZ_OK ? $self : undef;
@@ -75,7 +75,7 @@ sub memberNames {
 # return ref to member with given name or undef
 sub memberNamed {
     my $self     = shift;
-    my $fileName = ( ref( $_[0] ) eq 'HASH' ) ? shift->{fileName} : shift;
+    my $fileName = ( ref( $_[0] ) eq 'HASH' ) ? shift->{zipName} : shift;
     foreach my $member ( $self->members() ) {
         return $member if $member->fileName() eq $fileName;
     }
@@ -133,7 +133,7 @@ sub fileName {
 
 sub removeMember {
     my $self    = shift;
-    my $member  = ( ref( $_[0] ) eq 'HASH' ) ? shift->{memberOrName} : shift;
+    my $member  = ( ref( $_[0] ) eq 'HASH' ) ? shift->{memberOrZipName} : shift;
     $member = $self->memberNamed($member) unless ref($member);
     return undef unless $member;
     my @newMembers = grep { $_ != $member } $self->members();
@@ -146,7 +146,7 @@ sub replaceMember {
 
     my ( $oldMember, $newMember );
     if ( ref( $_[0] ) eq 'HASH' ) {
-        $oldMember = $_[0]->{memberOrName};
+        $oldMember = $_[0]->{memberOrZipName};
         $newMember = $_[0]->{newMember};
     }
     else {
@@ -167,8 +167,8 @@ sub extractMember {
 
     my ( $member, $name );
     if ( ref( $_[0] ) eq 'HASH' ) {
-        $member = $_[0]->{memberOrName};
-        $name   = $_[0]->{extractedName};
+        $member = $_[0]->{memberOrZipName};
+        $name   = $_[0]->{name};
     }
     else {
         ( $member, $name ) = @_;
@@ -204,8 +204,8 @@ sub extractMemberWithoutPaths {
 
     my ( $member, $name );
     if ( ref( $_[0] ) eq 'HASH' ) {
-        $member = $_[0]->{memberOrName};
-        $name   = $_[0]->{extractedName};
+        $member = $_[0]->{memberOrZipName};
+        $name   = $_[0]->{name};
     }
     else {
         ( $member, $name ) = @_;
@@ -237,9 +237,9 @@ sub addFile {
 
     my ( $fileName, $newName, $compressionLevel );
     if ( ref( $_[0] ) eq 'HASH' ) {
-        $fileName         = $_[0]->{fileName};
-        $newName          = $_[0]->{newName};
-        $compressionLevel = $_[0]->{desiredCompressionLevel};
+        $fileName         = $_[0]->{filename};
+        $newName          = $_[0]->{zipName};
+        $compressionLevel = $_[0]->{compressionLevel};
     }
     else {
         ( $fileName, $newName, $compressionLevel ) = @_;
@@ -263,9 +263,9 @@ sub addString {
 
     my ( $stringOrStringRef, $name, $compressionLevel );
     if ( ref( $_[0] ) eq 'HASH' ) {
-        $stringOrStringRef = $_[0]->{stringOrStringRef};
-        $name              = $_[0]->{name};
-        $compressionLevel  = $_[0]->{desiredCompressionLevel};
+        $stringOrStringRef = $_[0]->{string};
+        $name              = $_[0]->{zipName};
+        $compressionLevel  = $_[0]->{compressionLevel};
     }
     else {
         ( $stringOrStringRef, $name, $compressionLevel ) = @_;;
@@ -284,7 +284,7 @@ sub addDirectory {
     my ( $name, $newName );
     if ( ref( $_[0] ) eq 'HASH' ) {
         $name    = $_[0]->{directoryName};
-        $newName = $_[0]->{newName};
+        $newName = $_[0]->{zipName};
     }
     else {
         ( $name, $newName ) = @_;
@@ -312,8 +312,8 @@ sub addFileOrDirectory {
     my ( $name, $newName, $compressionLevel );
     if ( ref( $_[0] ) eq 'HASH' ) {
         $name             = $_[0]->{name};
-        $newName          = $_[0]->{newName};
-        $compressionLevel = $_[0]->{desiredCompressionLevel};
+        $newName          = $_[0]->{zipName};
+        $compressionLevel = $_[0]->{compressionLevel};
     }
     else {
         ( $name, $newName, $compressionLevel ) = @_;
@@ -341,8 +341,8 @@ sub contents {
 
     my ( $member, $newContents );
     if ( ref( $_[0] ) eq 'HASH' ) {
-        $member      = $_[0]->{memberOrMemberName};
-        $newContents = $_[0]->{newContents};
+        $member      = $_[0]->{memberOrZipName};
+        $newContents = $_[0]->{contents};
     }
     else {
         ( $member, $newContents ) = @_;
@@ -357,7 +357,7 @@ sub contents {
 sub writeToFileNamed {
     my $self = shift;
     my $fileName =
-      ( ref( $_[0] ) eq 'HASH' ) ? shift->{fileName} : shift;  # local FS format
+      ( ref( $_[0] ) eq 'HASH' ) ? shift->{filename} : shift;  # local FS format
     foreach my $member ( $self->members() ) {
         if ( $member->_usesFileNamed($fileName) ) {
             return _error( "$fileName is needed by member "
@@ -381,12 +381,12 @@ sub writeToFileHandle {
 
     my ( $fh, $fhIsSeekable );
     if ( ref( $_[0] ) eq 'HASH' ) {
-        $fh = $_[0]->{fileHandle};
+        $fh           = $_[0]->{fileHandle};
         $fhIsSeekable =
-          exists( $_[0]->{seekable} ) ? $_[0]->{seekable} : _isSeekable($fh);
+          exists( $_[0]->{seek} ) ? $_[0]->{seek} : _isSeekable($fh);
     }
     else {
-        $fh = shift;
+        $fh           = shift;
         $fhIsSeekable = @_ ? shift : _isSeekable($fh);
     }
 
@@ -396,7 +396,7 @@ sub writeToFileHandle {
 
     # Find out where the current position is.
     my $offset = $fhIsSeekable ? $fh->tell() : 0;
-    $offset = 0 if $offset < 0;
+    $offset    = 0 if $offset < 0;
 
     foreach my $member ( $self->members() ) {
         my $retval = $member->_writeToFileHandle( $fh, $fhIsSeekable, $offset );
@@ -427,7 +427,7 @@ sub overwrite {
 # Returns AZ_OK if successful.
 sub overwriteAs {
     my $self    = shift;
-    my $zipName = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{newName} : shift;
+    my $zipName = ( ref( $_[0] ) eq 'HASH' ) ? $_[0]->{filename} : shift;
     return _error("no filename in overwriteAs()") unless defined($zipName);
 
     my ( $fh, $tempName ) = Archive::Zip::tempFile();
@@ -540,7 +540,7 @@ sub writeCentralDirectory {
 
 sub read {
     my $self     = shift;
-    my $fileName = ( ref( $_[0] ) eq 'HASH' ) ? shift->{fileName} : shift;
+    my $fileName = ( ref( $_[0] ) eq 'HASH' ) ? shift->{filename} : shift;
     return _error('No filename given') unless $fileName;
     my ( $status, $fh ) = _newFileHandle( $fileName, 'r' );
     return _ioError("opening $fileName for read") unless $status;
@@ -559,7 +559,7 @@ sub readFromFileHandle {
     my ( $fh, $fileName );
     if ( ref( $_[0] ) eq 'HASH' ) {
         $fh       = $_[0]->{fileHandle};
-        $fileName = $_[0]->{fileName};
+        $fileName = $_[0]->{filename};
     }
     else {
         ( $fh, $fileName ) = @_;
@@ -712,9 +712,9 @@ sub addTree {
     my ( $root, $dest, $pred, $compressionLevel );
     if ( ref( $_[0] ) eq 'HASH' ) {
         $root             = $_[0]->{root};
-        $dest             = $_[0]->{dest};
-        $pred             = $_[0]->{choose};
-        $compressionLevel = $_[0]->{desiredCompressionLevel};
+        $dest             = $_[0]->{zipName};
+        $pred             = $_[0]->{select};
+        $compressionLevel = $_[0]->{compressionLevel};
     }
     else {
         ( $root, $dest, $pred, $compressionLevel ) = @_;
@@ -772,10 +772,10 @@ sub addTreeMatching {
     my ( $root, $dest, $pattern, $pred, $compressionLevel );
     if ( ref( $_[0] ) eq 'HASH' ) {
         $root             = $_[0]->{root};
-        $dest             = $_[0]->{dest};
+        $dest             = $_[0]->{zipName};
         $pattern          = $_[0]->{pattern};
-        $pred             = $_[0]->{choose};
-        $compressionLevel = $_[0]->{desiredCompressionLevel};
+        $pred             = $_[0]->{select};
+        $compressionLevel = $_[0]->{compressionLevel};
     }
     else {
         ( $root, $dest, $pattern, $pred, $compressionLevel ) = @_;
@@ -802,7 +802,7 @@ sub extractTree {
     my ( $root, $dest, $volume );
     if ( ref( $_[0] ) eq 'HASH' ) {
         $root   = $_[0]->{root};
-        $dest   = $_[0]->{dest};
+        $dest   = $_[0]->{zipName};
         $volume = $_[0]->{volume};
     }
     else {
@@ -833,8 +833,8 @@ sub updateMember {
 
     my ( $oldMember, $fileName );
     if ( ref( $_[0] ) eq 'HASH' ) {
-        $oldMember        = $_[0]->{memberOrName};
-        $fileName         = $_[0]->{name};
+        $oldMember = $_[0]->{memberOrZipName};
+        $fileName  = $_[0]->{name};
     }
     else {
         ( $oldMember, $fileName ) = @_;
@@ -906,10 +906,10 @@ sub updateTree {
     my ( $root, $dest, $pred, $mirror, $compressionLevel );
     if ( ref( $_[0] ) eq 'HASH' ) {
         $root             = $_[0]->{root};
-        $dest             = $_[0]->{dest};
-        $pred             = $_[0]->{choose};
+        $dest             = $_[0]->{zipName};
+        $pred             = $_[0]->{select};
         $mirror           = $_[0]->{mirror};
-        $compressionLevel = $_[0]->{desiredCompressionLevel};
+        $compressionLevel = $_[0]->{compressionLevel};
     }
     else {
         ( $root, $dest, $pred, $mirror, $compressionLevel ) = @_;

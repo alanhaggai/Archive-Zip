@@ -296,7 +296,7 @@ sub computeCRC32 {
 		if ( !exists $_[0] || UNIVERSAL::isa( $_[0], 'Archive::Zip::Archive' ) )
 		{
 			$data = $temp->{string};
-			$crc  = $temp->{crc};
+			$crc  = $temp->{checksum};
 		}
 	}
 	else {
@@ -313,7 +313,7 @@ sub computeCRC32 {
 # Also sets Zlib's default buffer size (eventually).
 sub setChunkSize {
 	shift if ref( $_[0] ) eq 'Archive::Zip::Archive';
-	my $chunkSize = ( ref( $_[0] ) eq 'HASH' ) ? shift->{size} : shift;
+	my $chunkSize = ( ref( $_[0] ) eq 'HASH' ) ? shift->{chunkSize} : shift;
 	my $oldChunkSize = $Archive::Zip::ChunkSize;
 	$Archive::Zip::ChunkSize = $chunkSize if ($chunkSize);
 	return $oldChunkSize;
@@ -495,7 +495,7 @@ sub _readSignature {
 #
 
 sub tempFile {
-	my $dir = ( ref( $_[0] ) eq 'HASH' ) ? shift->{tmpDir} : shift;
+	my $dir = ( ref( $_[0] ) eq 'HASH' ) ? shift->{tempDir} : shift;
 	my ( $fh, $filename ) = File::Temp::tempfile(
 		SUFFIX => '.zip',
 		UNLINK => 0,        # we will delete it!
