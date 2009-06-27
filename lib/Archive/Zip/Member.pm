@@ -61,9 +61,19 @@ sub newFromString {
 }
 
 sub newFromFile {
-    my $class    = shift;
-    my $fileName = ( ref( $_[0] ) eq 'HASH' ) ? shift->{filename} : shift;
-    my $self     = $class->NEWFILEMEMBERCLASS->_newFromFileNamed($fileName);
+    my $class = shift;
+
+    my ( $fileName, $zipName );
+    if ( ref( $_[0] ) eq 'HASH' ) {
+        $fileName = $_[0]->{fileName};
+        $zipName  = $_[0]->{zipName};
+    }
+    else {
+        ( $fileName, $zipName ) = @_;
+    }
+
+    my $self = $class->NEWFILEMEMBERCLASS->_newFromFileNamed( $fileName,
+      $zipName );
     return $self;
 }
 
