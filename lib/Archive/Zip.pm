@@ -480,7 +480,7 @@ sub _readSignature {
 }
 
 # Utility method to make and open a temp file.
-# Will create $temp_dir if it doesn't exist.
+# Will create $tempDir if it doesn't exist.
 # Returns file handle and name:
 #
 # my ($fh, $name) = Archive::Zip::tempFile();

@@ -791,9 +791,9 @@ sub addTreeMatching {
     return $self->addTree( $root, $dest, $matcher, $compressionLevel );
 }
 
-# $zip->extractTree( $root, $dest [, $volume] );
+# $zip->extractTree( $root, $zipName [, $volume] );
 #
-# $root and $dest are Unix-style.
+# $root and $zipName are Unix-style.
 # $volume is in local FS format.
 #
 sub extractTree {
@@ -825,7 +825,7 @@ sub extractTree {
     return AZ_OK;
 }
 
-# $zip->updateMember( $memberOrName, $fileName );
+# $zip->updateMember( $memberOrZipName, $name );
 # Returns (possibly updated) member, if any; undef on errors.
 
 sub updateMember {
@@ -892,7 +892,9 @@ sub updateMember {
     return $oldMember;
 }
 
-# $zip->updateTree( $root, [ $dest, [ $pred [, $mirror]]] );
+# $zip->updateTree(
+#   $root, [ $zipName, [ $select [, $mirror [, $compressionLevel ] ] ] ]
+# );
 #
 # This takes the same arguments as addTree, but first checks to see
 # whether the file or directory already exists in the zip file.
